@@ -15,11 +15,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local ParryRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("kebaind")
 
--- Function para hanapin ang bola
+-- FUNCTION PARA HANAPIN ANG BOLA (May filter para sa MeshPart na nakita sa scanner)
 local function getBall()
     for _, object in ipairs(Workspace:GetChildren()) do
-        if object.Name == "Ball" or object:FindFirstChild("Ball") then
-            return object
+        -- Nilaktawan natin ang Terrain at FakeSky na nakita sa scan natin kanina
+        if object:IsA("BasePart") and object.Name ~= "Terrain" and object.Name ~= "FakeSky" then
+            -- Kung ang pangalan ay Ball, MeshPart, o simpleng Part, ituturing nating bola
+            if object.Name == "Ball" or object.Name == "MeshPart" or object.Name == "Part" then
+                return object
+            end
         end
     end
     return nil
@@ -27,12 +31,10 @@ end
 
 -- FUNCTION PARA I-CHECK KUNG IKAW ANG TARGET NG BOLA
 local function isBallTargetingMe(ball)
-    -- Tinitignan kung ang attribute ng bola ay pangalan mo
     if ball:GetAttribute("target") == LocalPlayer.Name or ball:GetAttribute("Target") == LocalPlayer.Name then
         return true
     end
     
-    -- Alternatibong check kung ObjectValue ang gamit ng laro
     local targetVal = ball:FindFirstChild("target") or ball:FindFirstChild("Target")
     if targetVal and targetVal.Value == LocalPlayer.Character then
         return true
@@ -49,13 +51,12 @@ task.spawn(function()
             local character = LocalPlayer.Character
             
             if ball and character and character:FindFirstChild("HumanoidRootPart") then
-                -- Check muna kung ikaw ba ang totoong target ng bola
                 if isBallTargetingMe(ball) then
                     local playerPos = character.HumanoidRootPart.Position
                     local ballPos = ball.Position
                     local distance = (playerPos - ballPos).Magnitude
                     
-                    local ActivationDistance = 20 -- Distansya ng palo
+                    local ActivationDistance = 20 -- Distansya ng palo (Pwede mong taasan kung late pumalo)
                     
                     if distance <= ActivationDistance then
                         ParryRemote:FireServer()
