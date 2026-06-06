@@ -17,7 +17,7 @@ local HasManualParried = false -- Hard Anti-Cheat Lock Hook
 local ManualSpamEnabled = false
 local IsSpamming = false
 local BallTrackerEnabled = false 
-local LastParryTick = 0 -- Anti-Spam Guard
+local LastParryTick = 0 
 
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
@@ -250,7 +250,7 @@ floatStroke.Thickness = 1
 floatStroke.Color = Color3.fromRGB(60, 60, 60) 
 floatStroke.Parent = spamFloatButton
 
--- UNDETECTED SPAM COMMAND LOOPER
+-- FIXED UNDETECTED SPAM LOOP (May safe delay na para iwas crash)
 local function executeSpamLoop()
     task.spawn(function()
         while IsSpamming and ManualSpamEnabled and HasManualParried do
@@ -259,7 +259,7 @@ local function executeSpamLoop()
                 task.wait(math.random(15, 30) / 1000) 
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
             end)
-            task.wait(math.random(15, 35) / 1000) 
+            task.wait(math.random(20, 40) / 1000) -- Mas ligtas na cooldown interval
         end
     end)
 end
@@ -512,7 +512,7 @@ local function MonitorBall(Ball)
                 end
             end
             
-            -- FIXED LOGIC BYPASS: Hinahayaan pa ring mag-update ang posisyon kahit wala pang manual parry para hindi mag-freeze ang math
+            -- GUMAGANANG PARRY TRIGGER KAPAG NAKA-BYPASS NA
             if HasManualParried and AutoParryEnabled and isTargetingMe and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 local myPos = Player.Character.HumanoidRootPart.Position
                 local distance = (Ball.Position - myPos).Magnitude
