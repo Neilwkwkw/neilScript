@@ -16,6 +16,7 @@ local ActivationDistance = 30
 local HasManualParried = false -- Hard Anti-Cheat Lock
 local ManualSpamEnabled = false
 local IsSpamming = false
+local BallTrackerEnabled = false -- New Toggle Variable
 
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
@@ -81,6 +82,7 @@ minButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 minButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minButton.TextSize = 12
 minButton.Font = Enum.Font.GothamBold
+minButton.ZIndex = 5 
 minButton.Parent = titleBar
 
 Instance.new("UICorner", minButton).CornerRadius = UDim.new(0, 6)
@@ -98,47 +100,61 @@ scrollFrame.BackgroundTransparency = 1
 scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 2
 scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 280)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 320) -- Bahagyang tinaasan para sa bagong toggle
 scrollFrame.Parent = mainFrame
 
 Instance.new("UIListLayout", scrollFrame).Padding = UDim.new(0, 10)
-
--- Minimize / Maximize Logic
-local isMinimized = false
-minButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    local targetSize = isMinimized and UDim2.new(0, 320, 0, 50) or UDim2.new(0, 320, 0, 360)
-    minButton.Text = isMinimized and "+" or "—"
-    TweenService:Create(mainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetSize}):Play()
-end)
 
 -- Stats / Security Alert Label
 local statsLabel = Instance.new("TextLabel")
 statsLabel.Size = UDim2.new(1, -24, 0, 35)
 statsLabel.Position = UDim2.new(0, 12, 1, -48)
 statsLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-statsLabel.Text = "SECURITY: Hard-locked. Awaiting manual input."
-statsLabel.TextColor3 = Color3.fromRGB(160, 40, 40)
+statsLabel.Text = "ANTI-CHEAT: Waiting for your 1st manual parry..."
+statsLabel.TextColor3 = Color3.fromRGB(230, 160, 40) 
 statsLabel.Font = Enum.Font.GothamMedium
 statsLabel.TextSize = 11
 statsLabel.BorderSizePixel = 0
 statsLabel.Parent = mainFrame
 
 Instance.new("UICorner", statsLabel).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", statsLabel).Color = Color3.fromRGB(50, 30, 30)
+Instance.new("UIStroke", statsLabel).Color = Color3.fromRGB(60, 50, 30)
 
--- NOTIFICATION UI
-local function showNotification(message)
+-- Minimize / Unminimize Logic
+local isMinimized = false
+minButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        minButton.Text = "+"
+        scrollFrame.Visible = false
+        statsLabel.Visible = false
+        TweenService:Create(mainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 320, 0, 50)}):Play()
+    else
+        minButton.Text = "—"
+        local tween = TweenService:Create(mainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 320, 0, 360)})
+        tween:Play()
+        tween.Completed:Connect(function()
+            if not isMinimized then
+                scrollFrame.Visible = true
+                statsLabel.Visible = true
+            end
+        end)
+    end
+end)
+
+-- CENTER NOTIFICATION SYSTEM (Bypass Indicator)
+local function showNotification(message, isSuccess)
     local notifFrame = Instance.new("Frame")
-    notifFrame.Size = UDim2.new(0, 260, 0, 45)
-    notifFrame.Position = UDim2.new(0.5, -130, 0, -60)
+    notifFrame.Size = UDim2.new(0, 280, 0, 50)
+    notifFrame.Position = UDim2.new(0.5, -140, 0, -70) 
     notifFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    notifFrame.ZIndex = 10
     notifFrame.Parent = screenGui
     
     Instance.new("UICorner", notifFrame).CornerRadius = UDim.new(0, 8)
     local stroke = Instance.new("UIStroke", notifFrame)
-    stroke.Thickness = 1
-    stroke.Color = Color3.fromRGB(180, 50, 50)
+    stroke.Thickness = 1.5
+    stroke.Color = isSuccess and Color3.fromRGB(40, 230, 40) or Color3.fromRGB(230, 40, 40)
     
     local txt = Instance.new("TextLabel")
     txt.Size = UDim2.new(1, -20, 1, 0)
@@ -147,50 +163,100 @@ local function showNotification(message)
     txt.Text = message
     txt.TextColor3 = Color3.fromRGB(255, 255, 255)
     txt.Font = Enum.Font.GothamBold
-    txt.TextSize = 11
+    txt.TextSize = 12
     txt.Parent = notifFrame
     
-    notifFrame:TweenPosition(UDim2.new(0.5, -130, 0, 15), "Out", "Quad", 0.3, true)
+    notifFrame:TweenPosition(UDim2.new(0.5, -140, 0, 30), "Out", "Back", 0.4, true)
+    
     task.delay(3, function()
         if notifFrame and notifFrame.Parent then
-            notifFrame:TweenPosition(UDim2.new(0.5, -130, 0, -60), "In", "Quad", 0.3, true, function()
+            notifFrame:TweenPosition(UDim2.new(0.5, -140, 0, -70), "In", "Quad", 0.3, true, function()
                 notifFrame:Destroy()
             end)
         end
     end)
 end
 
--- CREATING FLOATING MANUAL SPAM BUTTON
+-- =========================================================
+-- NEW VISUAL COMPONENT: HUD BALL TRACKER DISPLAY PANEL
+-- =========================================================
+local trackerPanel = Instance.new("Frame")
+trackerPanel.Name = "BallTrackerPanel"
+trackerPanel.Size = UDim2.new(0, 200, 0, 100)
+trackerPanel.Position = UDim2.new(0.05, 0, 0.4, 0) -- Nakapwesto sa kaliwang bahagi ng screen mo
+trackerPanel.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+trackerPanel.BorderSizePixel = 0
+trackerPanel.Active = true
+trackerPanel.Draggable = true -- Pwede mo rin siyang i-drag kahit saan mo gusto ilagay sa screen
+trackerPanel.Visible = false
+trackerPanel.Parent = screenGui
+
+Instance.new("UICorner", trackerPanel).CornerRadius = UDim.new(0, 10)
+local trackerStroke = Instance.new("UIStroke", trackerPanel)
+trackerStroke.Thickness = 1
+trackerStroke.Color = Color3.fromRGB(50, 50, 50)
+
+local trackerTitle = Instance.new("TextLabel")
+trackerTitle.Text = "LIVE BALL TRACKER"
+trackerTitle.Size = UDim2.new(1, 0, 0, 25)
+trackerTitle.BackgroundTransparency = 1
+trackerTitle.TextColor3 = Color3.fromRGB(150, 150, 150)
+trackerTitle.Font = Enum.Font.GothamBold
+trackerTitle.TextSize = 10
+trackerTitle.Parent = trackerPanel
+
+local speedHUD = Instance.new("TextLabel")
+speedHUD.Text = "Velocity: 0 studs/s"
+speedHUD.Size = UDim2.new(1, -20, 0, 25)
+speedHUD.Position = UDim2.new(0, 10, 0, 30)
+speedHUD.BackgroundTransparency = 1
+speedHUD.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedHUD.Font = Enum.Font.GothamMedium
+speedHUD.TextSize = 12
+speedHUD.TextXAlignment = Enum.TextXAlignment.Left
+speedHUD.Parent = trackerPanel
+
+local targetHUD = Instance.new("TextLabel")
+targetHUD.Text = "Target: SAFE"
+targetHUD.Size = UDim2.new(1, -20, 0, 25)
+targetHUD.Position = UDim2.new(0, 10, 0, 60)
+targetHUD.BackgroundTransparency = 1
+targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) -- Green kapag safe ka
+targetHUD.Font = Enum.Font.GothamBold
+targetHUD.TextSize = 13
+targetHUD.TextXAlignment = Enum.TextXAlignment.Left
+targetHUD.Parent = trackerPanel
+
+-- FLOATING MANUAL SPAM BUTTON
 local spamFloatButton = Instance.new("TextButton")
 spamFloatButton.Name = "SpamFloatButton"
-spamFloatButton.Size = UDim2.new(0, 70, 0, 70)
-spamFloatButton.Position = UDim2.new(0.8, 0, 0.5, -35)
-spamFloatButton.BackgroundColor3 = Color3.fromRGB(230, 30, 30) -- Striking Crimson Red
+spamFloatButton.Size = UDim2.new(0, 65, 0, 65)
+spamFloatButton.Position = UDim2.new(0.8, 0, 0.5, -32)
+spamFloatButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20) 
 spamFloatButton.Text = "SPAM"
-spamFloatButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+spamFloatButton.TextColor3 = Color3.fromRGB(255, 255, 255) 
 spamFloatButton.Font = Enum.Font.GothamBold
-spamFloatButton.TextSize = 14
+spamFloatButton.TextSize = 13
 spamFloatButton.Active = true
-spamFloatButton.Draggable = true -- Pwedeng galawin kahit saan sa screen
+spamFloatButton.Draggable = true 
 spamFloatButton.Visible = false
 spamFloatButton.Parent = screenGui
 
 local floatCorner = Instance.new("UICorner")
-floatCorner.CornerRadius = UDim.new(1, 0) -- Perfect Circle Shape
+floatCorner.CornerRadius = UDim.new(1, 0)
 floatCorner.Parent = spamFloatButton
 
 local floatStroke = Instance.new("UIStroke")
-floatStroke.Thickness = 3
-floatStroke.Color = Color3.fromRGB(255, 255, 255)
+floatStroke.Thickness = 1
+floatStroke.Color = Color3.fromRGB(60, 60, 60) 
 floatStroke.Parent = spamFloatButton
 
--- SPAM MECHANISM DETECTOR
+-- SPAM COMMAND LOOPER
 local function executeSpamLoop()
     task.spawn(function()
         while IsSpamming and ManualSpamEnabled and HasManualParried do
             pcall(function()
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                -- Super bilis na tick rate ngunit ligtas pa rin mula sa frame logs analysis (0.010 - 0.022s)
                 task.wait(math.random(10, 22) / 1000) 
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
             end)
@@ -199,24 +265,24 @@ local function executeSpamLoop()
     end)
 end
 
--- Mouse/Touch Press Down (Pagsisimula ng spam)
 spamFloatButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         IsSpamming = true
-        spamFloatButton.BackgroundColor3 = Color3.fromRGB(150, 10, 10) -- Magdidilim kapag pinipindot
+        spamFloatButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
+        spamFloatButton.TextColor3 = Color3.fromRGB(0, 0, 0)
         executeSpamLoop()
     end
 end)
 
--- Mouse/Touch Release (Paghinto ng spam)
 spamFloatButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         IsSpamming = false
-        spamFloatButton.BackgroundColor3 = Color3.fromRGB(230, 30, 30)
+        spamFloatButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        spamFloatButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     end
 end)
 
--- MINIMALIST SLIDER FUNCTION
+-- SLIDER COMPONENT
 local function createSlider(label, minVal, maxVal, defaultVal, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 65)
@@ -284,8 +350,8 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     end)
 end
 
--- MINIMALIST TOGGLE FUNCTION
-local function createToggle(label, defaultState, isSpamToggle, callback)
+-- TOGGLE COMPONENT
+local function createToggle(label, defaultState, callback)
     local container = Instance.new("TextButton")
     container.Size = UDim2.new(1, 0, 0, 45)
     container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
@@ -324,12 +390,6 @@ local function createToggle(label, defaultState, isSpamToggle, callback)
     
     local isEnabled = defaultState
     container.MouseButton1Click:Connect(function()
-        -- KUNG HINDI PA NAG-P-PARRY ANG USER, LOCKOUT SYSTEM!
-        if not HasManualParried then
-            showNotification("Parry Manually First To Activate")
-            return
-        end
-        
         isEnabled = not isEnabled
         local targetColor = isEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(45, 45, 45)
         local circleColor = isEnabled and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(200, 200, 200)
@@ -343,33 +403,47 @@ local function createToggle(label, defaultState, isSpamToggle, callback)
     end)
 end
 
--- BUILD UI ELEMENTS
+-- BUILD THE CORE UI
 createSlider("Parry Distance (Studs)", 15, 60, 30, function(value) ActivationDistance = value end)
 
-createToggle("God Auto Parry", false, false, function(state)
+createToggle("God Auto Parry", false, function(state)
     AutoParryEnabled = state
-    statsLabel.Text = state and "Status: ACTIVE (God Mode)" or "Status: Monitoring..."
+    if HasManualParried then
+        statsLabel.Text = state and "Status: ACTIVE (God Mode)" or "Status: Monitoring..."
+    end
 end)
 
-createToggle("Manual Spam Button", false, true, function(state)
+createToggle("Manual Spam Button", false, function(state)
     ManualSpamEnabled = state
-    spamFloatButton.Visible = state
-    if not state then IsSpamming = false end -- Force reset if disabled
+    if HasManualParried then
+        spamFloatButton.Visible = state
+    else
+        spamFloatButton.Visible = false
+    end
+    if not state then IsSpamming = false end 
+end)
+
+-- ADDED THE BALL TRACKER HUD INTERFACE TOGGLE
+createToggle("Ball Tracker Display", false, function(state)
+    BallTrackerEnabled = state
+    trackerPanel.Visible = state
 end)
 
 -- =========================================================
--- SECURED LOCK MECHANISM (ANTI-CHEAT TRIGGER GATE)
+-- SECURED UNLOCK ENGINE (ANTI-CHEAT HANDSHAKE TRIGGER)
 -- =========================================================
 
 local function unlockEngine()
     if not HasManualParried then
         HasManualParried = true
-        statsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        statsLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        statsLabel.Text = "Status: Bypass Clean! Engine Unlocked."
-        statsLabel.Parent.UIStroke.Color = Color3.fromRGB(45, 45, 45)
         
-        -- Kung naka-on na agad ang switch settings bago ang unlock, i-update ang float button visibility dito
+        statsLabel.TextColor3 = Color3.fromRGB(40, 230, 40) 
+        statsLabel.BackgroundColor3 = Color3.fromRGB(15, 25, 15)
+        statsLabel.Text = "SYSTEM BYPASS: Clean Engine Engaged!"
+        statsLabel.Parent.UIStroke.Color = Color3.fromRGB(30, 60, 30)
+        
+        showNotification("SYSTEM BYPASS: ACTIVATED!", true)
+        
         if ManualSpamEnabled then
             spamFloatButton.Visible = true
         end
@@ -379,7 +453,7 @@ end
 UserInputService.InputBegan:Connect(function(input, processed)
     if input.KeyCode == Enum.KeyCode.F or input.UserInputType == Enum.UserInputType.Touch then
         if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-            unlockEngine()
+            task.delay(0.05, unlockEngine)
         end
     end
 end)
@@ -406,32 +480,54 @@ local function MonitorBall(Ball)
     connection = RunService.Heartbeat:Connect(function()
         if not Ball.Parent or not screenGui.Parent then
             connection:Disconnect()
+            -- I-reset ang HUD panel kapag nawala ang bola
+            speedHUD.Text = "Velocity: 0 studs/s"
+            targetHUD.Text = "Target: SAFE"
+            targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100)
             return
         end
         
-        -- HARD SECURITY LOCKOUT
-        if not HasManualParried then 
-            return 
-        end
+        -- Kumuha ng core metrics para sa tracking (Kahit hindi pa nagbi-bypass para may live debugging ka)
+        local currentTime = tick()
+        local deltaTime = currentTime - lastUpdateTime
+        local ballSpeed = 0
+        local isTargetingMe = IsTarget()
         
-        if AutoParryEnabled and IsTarget() and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-            local myPos = Player.Character.HumanoidRootPart.Position
-            local ballPos = Ball.Position
+        if deltaTime > 0 then
+            local realVelocity = (Ball.Position - lastPosition) / deltaTime
+            ballSpeed = realVelocity.Magnitude
             
-            local currentTime = tick()
-            local deltaTime = currentTime - lastUpdateTime
+            -- LIVE RENDERING UPDATE SA SCREEN TRACKER HUD
+            if BallTrackerEnabled then
+                speedHUD.Text = "Velocity: " .. math.floor(ballSpeed) .. " studs/s"
+                if isTargetingMe then
+                    targetHUD.Text = "Target: DANGER (YOU)"
+                    targetHUD.TextColor3 = Color3.fromRGB(255, 50, 50) -- Red kapag ikaw ang habol
+                    trackerStroke.Color = Color3.fromRGB(255, 50, 50)
+                else
+                    targetHUD.Text = "Target: SAFE"
+                    targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) -- Green kapag safe ka
+                    trackerStroke.Color = Color3.fromRGB(50, 50, 50)
+                end
+            end
             
-            if deltaTime > 0 then
-                local realVelocity = (ballPos - lastPosition) / deltaTime
-                local ballSpeed = realVelocity.Magnitude
-                local distance = (ballPos - myPos).Magnitude
+            -- Ligtas na Guard para sa auto-parry automation execution window
+            if not HasManualParried then 
+                lastPosition = Ball.Position
+                lastUpdateTime = tick()
+                return 
+            end
+            
+            if AutoParryEnabled and isTargetingMe and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                local myPos = Player.Character.HumanoidRootPart.Position
+                local distance = (Ball.Position - myPos).Magnitude
                 
                 local dynamicDistance = ActivationDistance + (ballSpeed * 0.11)
-                local dotProduct = realVelocity.Unit:Dot((myPos - ballPos).Unit)
+                local dotProduct = realVelocity.Unit:Dot((myPos - Ball.Position).Unit)
                 
                 if distance <= dynamicDistance and dotProduct > 0 then
                     Parry()
-                    statsLabel.Text = "Last Parry Speed: " .. math.floor(ballSpeed)
+                    statsLabel.Text = "Last Auto Parry Speed: " .. math.floor(ballSpeed)
                     task.wait(0.15)
                 end
             end
