@@ -8,43 +8,43 @@ local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 local Balls = Workspace:WaitForChild("Balls")
 
--- RANDOMIZER PARA SA UI DETECTION BYPASS
-local function generateSafeName()
-    local characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+-- BYPASS: RANDOM STRING GENERATOR PARA SA MGA ELEMENTO NG UI
+local function generateUnorderedKey()
+    local charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+    local length = math.random(15, 25)
     local result = ""
-    for i = 1, math.random(12, 22) do
-        local index = math.random(1, #characters)
-        result = result .. string.sub(characters, index, index)
+    for i = 1, length do
+        local rand = math.random(1, #charset)
+        result = result .. string.sub(charset, rand, rand)
     end
     return result
 end
 
--- MGA LIGTAS NA GLOBAL SETTINGS
+-- LIGTAS NA CONFIGURATIONS (WALANG FLAG LABELS)
 local AutoParryEnabled = false
 local ActivationDistance = 30 
 local HasManualParried = false 
 local ManualSpamEnabled = false
 local IsSpamming = false
-local BallTrackerEnabled = false
-local LastParryTick = 0
+local BallTrackerEnabled = false 
+local LastParryTick = 0 
 
--- Linisin ang mga lumang bakas ng UI gamit ang ligtas na pamamaraan
-for _, obj in pairs(PlayerGui:GetChildren()) do
-    if obj:IsA("ScreenGui") and obj:GetAttribute("CoreSysRuntime") then
-        obj:Destroy()
+-- Paglilinis ng mga lumang bakas ng GUI
+for _, child in pairs(PlayerGui:GetChildren()) do
+    if child:IsA("ScreenGui") and child:GetAttribute("RuntimeToken") then
+        child:Destroy()
     end
 end
 
--- LIGTAS NA SCREEN GUI (Walang nakakahalata na pangalan)
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = generateSafeName()
-screenGui:SetAttribute("CoreSysRuntime", true)
+screenGui.Name = generateUnorderedKey()
+screenGui:SetAttribute("RuntimeToken", true)
 screenGui.ResetOnSpawn = false
 screenGui.Parent = PlayerGui
 
--- Main Menu Frame (Decoy Theme)
+-- Main UI Window Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Name = generateSafeName()
+mainFrame.Name = generateUnorderedKey()
 mainFrame.Size = UDim2.new(0, 320, 0, 360)
 mainFrame.Position = UDim2.new(0.5, -160, 0.4, -180) 
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -61,9 +61,9 @@ local uiStroke = Instance.new("UIStroke", mainFrame)
 uiStroke.Thickness = 1
 uiStroke.Color = Color3.fromRGB(45, 45, 45)
 
--- Title Bar
+-- Header/Title Bar Frame
 local titleBar = Instance.new("Frame")
-titleBar.Name = generateSafeName()
+titleBar.Name = generateUnorderedKey()
 titleBar.Size = UDim2.new(1, 0, 0, 50)
 titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 titleBar.BorderSizePixel = 0
@@ -72,8 +72,8 @@ titleBar.Parent = mainFrame
 Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 12)
 
 local title = Instance.new("TextLabel")
-title.Name = generateSafeName()
-title.Text = "SYSTEM ENVIRONMENT // V2.0" -- Pekeng pangalan para sa bypass ng scanner
+title.Name = generateUnorderedKey()
+title.Text = "SYSTEM DRIVER // SERVICE CORE" -- Pekeng pangalan laban sa scanner
 title.Size = UDim2.new(1, -50, 1, 0)
 title.Position = UDim2.new(0, 15, 0, 0)
 title.BackgroundTransparency = 1
@@ -83,9 +83,9 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
--- Minimize Button
+-- Minimize Trigger Button
 local minButton = Instance.new("TextButton")
-minButton.Name = generateSafeName()
+minButton.Name = generateUnorderedKey()
 minButton.Text = "—"
 minButton.Size = UDim2.new(0, 26, 0, 26)
 minButton.Position = UDim2.new(1, -38, 0.5, -13)
@@ -97,11 +97,13 @@ minButton.ZIndex = 5
 minButton.Parent = titleBar
 
 Instance.new("UICorner", minButton).CornerRadius = UDim.new(0, 6)
-Instance.new("UIStroke", minButton).Color = Color3.fromRGB(50, 50, 50)
+local minStroke = Instance.new("UIStroke", minButton)
+minStroke.Thickness = 1
+minStroke.Color = Color3.fromRGB(50, 50, 50)
 
--- Scroll Menu
+-- Scrolling Container List
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Name = generateSafeName()
+scrollFrame.Name = generateUnorderedKey()
 scrollFrame.Size = UDim2.new(1, -24, 1, -125)
 scrollFrame.Position = UDim2.new(0, 12, 0, 65)
 scrollFrame.BackgroundTransparency = 1
@@ -113,12 +115,12 @@ scrollFrame.Parent = mainFrame
 
 Instance.new("UIListLayout", scrollFrame).Padding = UDim.new(0, 10)
 
--- Bottom Status Label
+-- Bottom Analytics Log Label
 local statsLabel = Instance.new("TextLabel")
 statsLabel.Size = UDim2.new(1, -24, 0, 35)
 statsLabel.Position = UDim2.new(0, 12, 1, -48)
 statsLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-statsLabel.Text = "SECURITY: Please press 'F' key once to verify..."
+statsLabel.Text = "SYSTEM: Tap 'F' once to synchronize client..."
 statsLabel.TextColor3 = Color3.fromRGB(230, 160, 40) 
 statsLabel.Font = Enum.Font.GothamMedium
 statsLabel.TextSize = 11
@@ -126,9 +128,10 @@ statsLabel.BorderSizePixel = 0
 statsLabel.Parent = mainFrame
 
 Instance.new("UICorner", statsLabel).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", statsLabel).Color = Color3.fromRGB(60, 50, 30)
+local bottomStroke = Instance.new("UIStroke", statsLabel)
+bottomStroke.Color = Color3.fromRGB(60, 50, 30)
 
--- UI Toggle Minimization Logic
+-- Minimization View Animation Logic
 local isMinimized = false
 minButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
@@ -150,9 +153,9 @@ minButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- DECOY DISPLAY PANEL (Dating Ball Tracker)
+-- DECOY DATA MONITOR PANEL (Dating Ball Tracker Display)
 local trackerPanel = Instance.new("Frame")
-trackerPanel.Name = generateSafeName()
+trackerPanel.Name = generateUnorderedKey()
 trackerPanel.Size = UDim2.new(0, 200, 0, 100)
 trackerPanel.Position = UDim2.new(0.05, 0, 0.4, 0) 
 trackerPanel.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
@@ -168,7 +171,7 @@ trackerStroke.Thickness = 1
 trackerStroke.Color = Color3.fromRGB(50, 50, 50)
 
 local trackerTitle = Instance.new("TextLabel")
-trackerTitle.Text = "METRIC LOGS"
+trackerTitle.Text = "CORE ANALYTICS"
 trackerTitle.Size = UDim2.new(1, 0, 0, 25)
 trackerTitle.BackgroundTransparency = 1
 trackerTitle.TextColor3 = Color3.fromRGB(150, 150, 150)
@@ -177,7 +180,7 @@ trackerTitle.TextSize = 10
 trackerTitle.Parent = trackerPanel
 
 local speedHUD = Instance.new("TextLabel")
-speedHUD.Text = "Runtime Trace: Stable"
+speedHUD.Text = "Data Stream: Stable"
 speedHUD.Size = UDim2.new(1, -20, 0, 25)
 speedHUD.Position = UDim2.new(0, 10, 0, 30)
 speedHUD.BackgroundTransparency = 1
@@ -187,13 +190,24 @@ speedHUD.TextSize = 12
 speedHUD.TextXAlignment = Enum.TextXAlignment.Left
 speedHUD.Parent = trackerPanel
 
--- FLOATING MACRO BUTTON
+local targetHUD = Instance.new("TextLabel")
+targetHUD.Text = "Environment Status: Safe"
+targetHUD.Size = UDim2.new(1, -20, 0, 25)
+targetHUD.Position = UDim2.new(0, 10, 0, 60)
+targetHUD.BackgroundTransparency = 1
+targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) 
+targetHUD.Font = Enum.Font.GothamBold
+targetHUD.TextSize = 13
+targetHUD.TextXAlignment = Enum.TextXAlignment.Left
+targetHUD.Parent = trackerPanel
+
+-- DECOY MACRO SPAM TRIGGER BUTTON
 local spamFloatButton = Instance.new("TextButton")
-spamFloatButton.Name = generateSafeName()
+spamFloatButton.Name = generateUnorderedKey()
 spamFloatButton.Size = UDim2.new(0, 65, 0, 65)
 spamFloatButton.Position = UDim2.new(0.8, 0, 0.5, -32)
 spamFloatButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20) 
-spamFloatButton.Text = "RUN"
+spamFloatButton.Text = "SYS"
 spamFloatButton.TextColor3 = Color3.fromRGB(255, 255, 255) 
 spamFloatButton.Font = Enum.Font.GothamBold
 spamFloatButton.TextSize = 13
@@ -203,21 +217,25 @@ spamFloatButton.Visible = false
 spamFloatButton.Parent = screenGui
 
 Instance.new("UICorner", spamFloatButton).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", spamFloatButton).Color = Color3.fromRGB(60, 60, 60)
+local floatStroke = Instance.new("UIStroke", spamFloatButton)
+floatStroke.Thickness = 1
+floatStroke.Color = Color3.fromRGB(60, 60, 60)
 
--- LIGTAS NA RUNTIME PARRY EXECUTOR (Kukunin lang ang service kapag kinakailangan)
+-- PROTECTED CALCULATION INPUT SERVICE (Tinatawag lang kapag magpaparry para tago sa logs)
 local function Parry()
     local currentTick = tick()
-    if currentTick - LastParryTick < 0.15 then return end -- Cooldown interval protector
+    if currentTick - LastParryTick < 0.22 then return end 
     LastParryTick = currentTick
 
-    pcall(function()
-        local VIM = game:GetService("VirtualInputManager")
-        if VIM then
-            VIM:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-            task.wait(0.05) -- Eksaktong delay mula sa iyong orihinal na code
-            VIM:SendKeyEvent(false, Enum.KeyCode.F, false, game)
-        end
+    task.defer(function() 
+        pcall(function()
+            local VIM = game:GetService("VirtualInputManager")
+            if VIM then
+                VIM:SendKeyEvent(true, Enum.KeyCode.F, false, game)
+                task.wait(math.random(25, 45) / 1000) -- Orihinal mong hold delay
+                VIM:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+            end
+        end)
     end)
 end
 
@@ -225,7 +243,7 @@ local function executeSpamLoop()
     task.spawn(function()
         while IsSpamming and ManualSpamEnabled and HasManualParried do
             Parry()
-            task.wait(math.random(30, 60) / 1000) 
+            task.wait(math.random(30, 55) / 1000)
         end
     end)
 end
@@ -247,7 +265,7 @@ spamFloatButton.InputEnded:Connect(function(input)
     end
 end)
 
--- INTERFACE CREATOR UTILITIES
+-- UI MENU SLIDERS AT TOGGLES ENGINE BUILDER
 local function createSlider(label, minVal, maxVal, defaultVal, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 65)
@@ -367,36 +385,42 @@ local function createToggle(label, defaultState, callback)
     end)
 end
 
-createSlider("Trigger Metric", 15, 60, 30, function(value) ActivationDistance = value end)
+-- I-SET UP ANG COMPONENT LABELS NG MENU MO (Walang obvious text)
+createSlider("Trigger Offset Range", 15, 60, 30, function(value) ActivationDistance = value end)
 
-createToggle("Enable Core Driver", false, function(state)
+createToggle("Enable Environment Loop", false, function(state)
     AutoParryEnabled = state
     if HasManualParried then
-        statsLabel.Text = state and "Runtime: ENGAGED" or "Runtime: RE-STABILIZED"
+        statsLabel.Text = state and "Runtime: Active Override" or "Runtime: Standing Sync"
     end
 end)
 
-createToggle("Auxiliary Loop Driver", false, function(state)
+createToggle("Auxiliary System Input", false, function(state)
     ManualSpamEnabled = state
     if HasManualParried then spamFloatButton.Visible = state else spamFloatButton.Visible = false end
     if not state then IsSpamming = false end 
 end)
 
-createToggle("Metric Console Log", false, function(state)
+createToggle("Trace Console Stream", false, function(state)
     BallTrackerEnabled = state
     trackerPanel.Visible = state
 end)
 
--- INTEGRATED HANDSHAKE BYPASS
+-- ANTI-CHEAT VERIFICATION BYPASS METHOD (Kailangan ng 1st manual parry sa simula para maging ligtas)
 local function unlockEngine()
     if not HasManualParried then
         HasManualParried = true
+        
         statsLabel.TextColor3 = Color3.fromRGB(40, 230, 40) 
         statsLabel.BackgroundColor3 = Color3.fromRGB(15, 25, 15)
-        statsLabel.Text = "SECURITY STATUS: ENVIRONMENT SECURE"
-        statsLabel.Parent.UIStroke.Color = Color3.fromRGB(30, 60, 30)
-        title.Text = "SYSTEM DRIVER ACTIVE"
-        if ManualSpamEnabled then spamFloatButton.Visible = true end
+        statsLabel.Text = "SYSTEM BYPASS: Secure Handshake Clear!"
+        bottomStroke.Color = Color3.fromRGB(30, 60, 30)
+        
+        title.Text = "DREAM"
+        
+        if ManualSpamEnabled then
+            spamFloatButton.Visible = true
+        end
     end
 end
 
@@ -412,34 +436,60 @@ local function IsTarget()
     return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
 
--- ANG ORIHINAL MONG AUTO-PARRY ENGINE (Ligtas at Walang Heartbeat Hooks)
-Balls.ChildAdded:Connect(function(Ball)
-    if Ball:GetAttribute("realBall") ~= true then return end
+-- ANG CORE AUTO PARRY PROCESSING MO (Walang mapanganib na permanent connections sa folder)
+local function HookBallVelocityEvents(Ball)
+    if not Ball:IsA("BasePart") or Ball:GetAttribute("realBall") ~= true then return end
+    
+    local lastPosition = Ball.Position
+    local lastUpdateTime = tick()
     
     Ball:GetPropertyChangedSignal("Position"):Connect(function()
-        if AutoParryEnabled and HasManualParried and IsTarget() and Ball.Parent then
-            local Distance = (Ball.Position - Workspace.CurrentCamera.Focus.Position).Magnitude
+        if not Ball.Parent then return end
+        
+        local currentTime = tick()
+        local deltaTime = currentTime - lastUpdateTime
+        local ballSpeed = 0
+        local isTargetingMe = IsTarget()
+        
+        if deltaTime > 0 then
+            local realVelocity = (Ball.Position - lastPosition) / deltaTime
+            ballSpeed = realVelocity.Magnitude
             
-            if Distance < ActivationDistance then
-                Parry()
-                if BallTrackerEnabled then
-                    speedHUD.Text = "Last Action Dist: " .. math.floor(Distance)
+            if BallTrackerEnabled then
+                speedHUD.Text = "Frequency: " .. math.floor(ballSpeed) .. " m/s"
+                if isTargetingMe then
+                    targetHUD.Text = "Threat Trace: HIGH"
+                    targetHUD.TextColor3 = Color3.fromRGB(255, 50, 50) 
+                    trackerStroke.Color = Color3.fromRGB(255, 50, 50)
+                else
+                    targetHUD.Text = "Threat Trace: NONE"
+                    targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) 
+                    trackerStroke.Color = Color3.fromRGB(50, 50, 50)
+                end
+            end
+            
+            -- ITONG MISMONG BUONG MATHEMATICAL CALCULATION MO ANG PINATAKBO NATIN
+            if HasManualParried and AutoParryEnabled and isTargetingMe and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                local myPos = Player.Character.HumanoidRootPart.Position
+                local distance = (Ball.Position - myPos).Magnitude
+                
+                local dynamicDistance = ActivationDistance + (ballSpeed * 0.11)
+                local dotProduct = realVelocity.Unit:Dot((myPos - Ball.Position).Unit)
+                
+                if distance <= dynamicDistance and dotProduct > 0 then
+                    Parry()
+                    statsLabel.Text = "Trigger Executed at: " .. math.floor(ballSpeed)
                 end
             end
         end
+        
+        lastPosition = Ball.Position
+        lastUpdateTime = tick()
     end)
-end)
-
--- I-hook din ang mga bolang kasalukuyan nang naroroon pagka-inject
-for _, existingBall in pairs(Balls:GetChildren()) do
-    if existingBall:IsA("BasePart") and existingBall:GetAttribute("realBall") == true then
-        existingBall:GetPropertyChangedSignal("Position"):Connect(function()
-            if AutoParryEnabled and HasManualParried and IsTarget() and existingBall.Parent then
-                local Distance = (existingBall.Position - Workspace.CurrentCamera.Focus.Position).Magnitude
-                if Distance < ActivationDistance then
-                    Parry()
-                end
-            end
-        end)
-    end
 end
+
+-- I-hook ang parehong luma at bagong spawn na bola sa pinakaligtas na paraan
+for _, ball in pairs(Balls:GetChildren()) do 
+    HookBallVelocityEvents(ball) 
+end
+Balls.ChildAdded:Connect(HookBallVelocityEvents)
