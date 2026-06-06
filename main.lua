@@ -13,7 +13,7 @@ local Balls = Workspace:WaitForChild("Balls")
 -- MGA GLOBAL SETTINGS
 local AutoParryEnabled = false
 local ActivationDistance = 30 
-local HasManualParried = false -- Gagamitin para sa anti-cheat check bypass
+local HasManualParried = false -- Anti-cheat check bypass state
 
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
@@ -70,7 +70,7 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
--- Minimize Button (Clean Modern Minus Symbol)
+-- Minimize Button
 local minButton = Instance.new("TextButton")
 minButton.Name = "MinButton"
 minButton.Text = "—"
@@ -159,7 +159,7 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     
     local fill = Instance.new("Frame")
     fill.Size = UDim2.new((defaultVal - minVal) / (maxVal - minVal), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Pure White Bar
+    fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     fill.BorderSizePixel = 0
     fill.Parent = sliderButton
     Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 2)
@@ -238,7 +238,7 @@ local function createToggle(label, defaultState, callback)
     end)
 end
 
--- Stats Label (Clean Status Section at the bottom)
+-- Stats Label
 local statsLabel = Instance.new("TextLabel")
 statsLabel.Size = UDim2.new(1, -24, 0, 35)
 statsLabel.Position = UDim2.new(0, 12, 1, -48)
@@ -248,23 +248,15 @@ statsLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 statsLabel.Font = Enum.Font.GothamMedium
 statsLabel.TextSize = 11
 statsLabel.BorderSizePixel = 0
-statsFrame = mainFrame
 statsLabel.Parent = mainFrame
 
 local statsCorner = Instance.new("UICorner")
 statsCorner.CornerRadius = UDim.new(0, 8)
 statsCorner.Parent = statsLabel
-
 Instance.new("UIStroke", statsLabel).Color = Color3.fromRGB(40, 40, 40)
 
-
--- =========================================================
 -- BUILD MINIMALIST UI ELEMENTS
--- =========================================================
-createSlider("Parry Distance (Studs)", 15, 60, 30, function(value)
-    ActivationDistance = value
-end)
-
+createSlider("Parry Distance (Studs)", 15, 60, 30, function(value) ActivationDistance = value end)
 createToggle("God Auto Parry", false, function(state)
     AutoParryEnabled = state
     if HasManualParried then
@@ -272,18 +264,15 @@ createToggle("God Auto Parry", false, function(state)
     end
 end)
 
-
 -- =========================================================
--- ADVANCED ANTI-CHEAT BYPASS SYSTEM
+-- ADVANCED SILENT ANTI-CHEAT BYPASS
 -- =========================================================
 
--- Bypass Part 1: Register User's First Manual Key Tap (Anti-Cheat Bypass Trigger)
 UserInputService.InputBegan:Connect(function(input, processed)
     if not HasManualParried and input.KeyCode == Enum.KeyCode.F then
         HasManualParried = true
         statsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         statsLabel.Text = "Status: Bypass Clean! Engine Unlocked."
-        print("[+] Manual input registered. Safe execution fully initialized!")
     end
 end)
 
@@ -291,15 +280,22 @@ local function IsTarget()
     return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
 
+-- INAYOS NA PARRY FUNCTION (ANTI-DETECTION METH)
 local function Parry()
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-    RunService.Heartbeat:Wait()
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+    -- Gagamit ng pcall (Protected Call) para hindi mag-iwan ng error traces sa console
+    pcall(function()
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
+        
+        -- Maglalagay ng randomized human-like reaction time delay (0.015 to 0.035 seconds)
+        -- para hindi maging patternized ang pagpindot sa paningin ng anti-cheat detector
+        task.wait(math.random(15, 35) / 1000) 
+        
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+    end)
 end
 
 local function MonitorBall(Ball)
-    -- Anti-Cheat Protection 1: Safe Filtering (Dapat Part object at may valid realBall token)
-    -- Blino-block nito ang Terrain, MeshParts, at Sky fakes para hindi kayo ma-spam detect sa logs!
+    -- Anti-Cheat Protection 1: Safe Filtering (Strict type checking)
     if not Ball:IsA("BasePart") or Ball:GetAttribute("realBall") ~= true then return end
     
     local lastPosition = Ball.Position
@@ -312,8 +308,7 @@ local function MonitorBall(Ball)
             return
         end
         
-        -- Anti-Cheat Protection 2: System Validation Check
-        -- Hinding hindi papalo ang auto-bot hangga't walang unang manual parry data ang Roblox client para iwas instant flag.
+        -- Anti-Cheat Protection 2: Manual Check Verification Before Injection
         if AutoParryEnabled and HasManualParried and IsTarget() and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
             local myPos = Player.Character.HumanoidRootPart.Position
             local ballPos = Ball.Position
@@ -332,7 +327,7 @@ local function MonitorBall(Ball)
                 if distance <= dynamicDistance and dotProduct > 0 then
                     Parry()
                     statsLabel.Text = "Last Parry Speed: " .. math.floor(ballSpeed)
-                    task.wait(0.12)
+                    task.wait(0.15) -- Bahagyang tinaasan ang cool-down para iwas spam block detection
                 end
             end
         end
@@ -344,5 +339,3 @@ end
 
 table.foreach(Balls:GetChildren(), function(_, ball) MonitorBall(ball) end)
 Balls.ChildAdded:Connect(MonitorBall)
-
-print("[+] Clean Minimalist Pro Engine Loaded & Protected!")
