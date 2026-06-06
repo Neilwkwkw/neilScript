@@ -6,69 +6,55 @@ local Window = Kavo.CreateLib("Blade Ball Client", "Midnight")
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Automation")
 
--- 3. MGA VARIABLE
-local AutoParryEnabled = false
+-- 3. MGA VARIABLE MULA SA TRAPA MO + GUI TOGGLE
+local AutoParryEnabled = false -- Kontrolado ng Toggle sa GUI
 
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalPlayer = Players.LocalPlayer
-local ParryRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("kebaind")
+local Players = game:GetService("Players")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
--- FUNCTION PARA HANAPIN ANG BOLA (May filter para sa MeshPart na nakita sa scanner)
-local function getBall()
-    for _, object in ipairs(Workspace:GetChildren()) do
-        -- Nilaktawan natin ang Terrain at FakeSky na nakita sa scan natin kanina
-        if object:IsA("BasePart") and object.Name ~= "Terrain" and object.Name ~= "FakeSky" then
-            -- Kung ang pangalan ay Ball, MeshPart, o simpleng Part, ituturing nating bola
-            if object.Name == "Ball" or object.Name == "MeshPart" or object.Name == "Part" then
-                return object
-            end
-        end
-    end
-    return nil
+local Player = Players.LocalPlayer
+local Balls = workspace:WaitForChild("Balls")
+
+-- Function ng tropa mo para sa Target Check gamit ang Highlight
+local function IsTarget()
+    return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
 
--- FUNCTION PARA I-CHECK KUNG IKAW ANG TARGET NG BOLA
-local function isBallTargetingMe(ball)
-    if ball:GetAttribute("target") == LocalPlayer.Name or ball:GetAttribute("Target") == LocalPlayer.Name then
-        return true
-    end
-    
-    local targetVal = ball:FindFirstChild("target") or ball:FindFirstChild("Target")
-    if targetVal and targetVal.Value == LocalPlayer.Character then
-        return true
-    end
-    
-    return false
+-- Function ng tropa mo para sa pagpindot ng 'F'
+local function Parry()
+    VirtualInputManager:SendKeyEvent(true, "F", false, game)
+    task.wait(0.05)
+    VirtualInputManager:SendKeyEvent(false, "F", false, game)
 end
 
--- 4. THE MAIN LOOP
-task.spawn(function()
-    while task.wait() do
-        if AutoParryEnabled then
-            local ball = getBall()
-            local character = LocalPlayer.Character
+-- 4. ANG EVENT LISTENER NG BOLA (Gagana lang kapag NAKA-ON ang toggle)
+Balls.ChildAdded:Connect(function(Ball)
+    if Ball:GetAttribute("realBall") ~= true then return end
+    
+    print("[+] Ball spawned, monitoring...")
+    
+    Ball:GetPropertyChangedSignal("Position"):Connect(function()
+        -- Dagdag na kondisyon: Dapat true rin ang AutoParryEnabled mula sa GUI
+        if AutoParryEnabled and IsTarget() and Ball.Parent then
+            local Distance = (Ball.Position - workspace.CurrentCamera.Focus.Position).Magnitude
             
-            if ball and character and character:FindFirstChild("HumanoidRootPart") then
-                if isBallTargetingMe(ball) then
-                    local playerPos = character.HumanoidRootPart.Position
-                    local ballPos = ball.Position
-                    local distance = (playerPos - ballPos).Magnitude
-                    
-                    local ActivationDistance = 20 -- Distansya ng palo (Pwede mong taasan kung late pumalo)
-                    
-                    if distance <= ActivationDistance then
-                        ParryRemote:FireServer()
-                        task.wait(0.1) -- Anti-spam cooldown
-                    end
-                end
+            -- Pwede mong baguhin itong 30 depende sa bilis ng bola
+            if Distance < 30 then
+                Parry()
+                print("[-] PARRIED! Distance:", Distance)
+                task.wait(0.1) -- Kaunting cooldown para maiwasan ang double-parry bug
             end
         end
-    end
+    end)
 end)
 
--- 5. TOGGLE BUTTON
-MainSection:NewToggle("Auto Parry", "Papalo lang kapag ikaw ang target at malapit ang bola", function(state)
+-- 5. TOGGLE BUTTON SA GUI
+MainSection:NewToggle("Auto Parry", "Gagamit ng Virtual Input at Highlight Tracker", function(state)
     AutoParryEnabled = state
+    if state then
+        print("[+] Auto Parry: NAKA-ON")
+    else
+        print("[-] Auto Parry: NAKA-OFF")
+    end
 end)
