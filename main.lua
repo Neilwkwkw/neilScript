@@ -16,7 +16,8 @@ local ActivationDistance = 30
 local HasManualParried = false -- Hard Anti-Cheat Lock
 local ManualSpamEnabled = false
 local IsSpamming = false
-local BallTrackerEnabled = false -- New Toggle Variable
+local BallTrackerEnabled = false 
+local LastParryTick = 0 -- Anti-Spam Guard Hook
 
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
@@ -100,7 +101,7 @@ scrollFrame.BackgroundTransparency = 1
 scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 2
 scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 320) -- Bahagyang tinaasan para sa bagong toggle
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 320)
 scrollFrame.Parent = mainFrame
 
 Instance.new("UIListLayout", scrollFrame).Padding = UDim.new(0, 10)
@@ -177,17 +178,15 @@ local function showNotification(message, isSuccess)
     end)
 end
 
--- =========================================================
--- NEW VISUAL COMPONENT: HUD BALL TRACKER DISPLAY PANEL
--- =========================================================
+-- HUD BALL TRACKER DISPLAY PANEL
 local trackerPanel = Instance.new("Frame")
 trackerPanel.Name = "BallTrackerPanel"
 trackerPanel.Size = UDim2.new(0, 200, 0, 100)
-trackerPanel.Position = UDim2.new(0.05, 0, 0.4, 0) -- Nakapwesto sa kaliwang bahagi ng screen mo
+trackerPanel.Position = UDim2.new(0.05, 0, 0.4, 0) 
 trackerPanel.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 trackerPanel.BorderSizePixel = 0
 trackerPanel.Active = true
-trackerPanel.Draggable = true -- Pwede mo rin siyang i-drag kahit saan mo gusto ilagay sa screen
+trackerPanel.Draggable = true 
 trackerPanel.Visible = false
 trackerPanel.Parent = screenGui
 
@@ -221,7 +220,7 @@ targetHUD.Text = "Target: SAFE"
 targetHUD.Size = UDim2.new(1, -20, 0, 25)
 targetHUD.Position = UDim2.new(0, 10, 0, 60)
 targetHUD.BackgroundTransparency = 1
-targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) -- Green kapag safe ka
+targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) 
 targetHUD.Font = Enum.Font.GothamBold
 targetHUD.TextSize = 13
 targetHUD.TextXAlignment = Enum.TextXAlignment.Left
@@ -251,16 +250,16 @@ floatStroke.Thickness = 1
 floatStroke.Color = Color3.fromRGB(60, 60, 60) 
 floatStroke.Parent = spamFloatButton
 
--- SPAM COMMAND LOOPER
+-- UNDETECTED SPAM COMMAND LOOPER (Humanized Random Delays)
 local function executeSpamLoop()
     task.spawn(function()
         while IsSpamming and ManualSpamEnabled and HasManualParried do
             pcall(function()
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                task.wait(math.random(10, 22) / 1000) 
+                task.wait(math.random(15, 30) / 1000) -- Random hold time
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
             end)
-            task.wait(0.01)
+            task.wait(math.random(15, 35) / 1000) -- Random interval cooldown to bypass logging
         end
     end)
 end
@@ -423,7 +422,6 @@ createToggle("Manual Spam Button", false, function(state)
     if not state then IsSpamming = false end 
 end)
 
--- ADDED THE BALL TRACKER HUD INTERFACE TOGGLE
 createToggle("Ball Tracker Display", false, function(state)
     BallTrackerEnabled = state
     trackerPanel.Visible = state
@@ -432,7 +430,6 @@ end)
 -- =========================================================
 -- SECURED UNLOCK ENGINE (ANTI-CHEAT HANDSHAKE TRIGGER)
 -- =========================================================
-
 local function unlockEngine()
     if not HasManualParried then
         HasManualParried = true
@@ -462,11 +459,18 @@ local function IsTarget()
     return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
 
+-- FIXED: HUMANIZED BYPASS INPUT WRAPPER (Anti-Kick Method)
 local function Parry()
-    pcall(function()
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-        task.wait(math.random(15, 35) / 1000) 
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+    local currentTick = tick()
+    if currentTick - LastParryTick < 0.25 then return end -- Exhaust Guard (Iwas magkasunod na double click sa parehong frame)
+    LastParryTick = currentTick
+
+    task.defer(function() -- Defer Execution para hindi ma-trace sa server frame timing loop
+        pcall(function()
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
+            task.wait(math.random(25, 45) / 1000) -- Humanized hold ratio delay (mukhang daliri ng tao)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
+        end)
     end)
 end
 
@@ -480,14 +484,12 @@ local function MonitorBall(Ball)
     connection = RunService.Heartbeat:Connect(function()
         if not Ball.Parent or not screenGui.Parent then
             connection:Disconnect()
-            -- I-reset ang HUD panel kapag nawala ang bola
             speedHUD.Text = "Velocity: 0 studs/s"
             targetHUD.Text = "Target: SAFE"
             targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100)
             return
         end
         
-        -- Kumuha ng core metrics para sa tracking (Kahit hindi pa nagbi-bypass para may live debugging ka)
         local currentTime = tick()
         local deltaTime = currentTime - lastUpdateTime
         local ballSpeed = 0
@@ -497,21 +499,19 @@ local function MonitorBall(Ball)
             local realVelocity = (Ball.Position - lastPosition) / deltaTime
             ballSpeed = realVelocity.Magnitude
             
-            -- LIVE RENDERING UPDATE SA SCREEN TRACKER HUD
             if BallTrackerEnabled then
                 speedHUD.Text = "Velocity: " .. math.floor(ballSpeed) .. " studs/s"
                 if isTargetingMe then
                     targetHUD.Text = "Target: DANGER (YOU)"
-                    targetHUD.TextColor3 = Color3.fromRGB(255, 50, 50) -- Red kapag ikaw ang habol
+                    targetHUD.TextColor3 = Color3.fromRGB(255, 50, 50) 
                     trackerStroke.Color = Color3.fromRGB(255, 50, 50)
                 else
                     targetHUD.Text = "Target: SAFE"
-                    targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) -- Green kapag safe ka
+                    targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100) 
                     trackerStroke.Color = Color3.fromRGB(50, 50, 50)
                 end
             end
             
-            -- Ligtas na Guard para sa auto-parry automation execution window
             if not HasManualParried then 
                 lastPosition = Ball.Position
                 lastUpdateTime = tick()
@@ -528,7 +528,6 @@ local function MonitorBall(Ball)
                 if distance <= dynamicDistance and dotProduct > 0 then
                     Parry()
                     statsLabel.Text = "Last Auto Parry Speed: " .. math.floor(ballSpeed)
-                    task.wait(0.15)
                 end
             end
         end
