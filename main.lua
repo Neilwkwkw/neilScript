@@ -44,7 +44,7 @@ local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 340, 0, 400)
 mainFrame.Position = UDim2.new(0.5, -170, 0.4, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 20, 35)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
@@ -56,16 +56,16 @@ corner.CornerRadius = UDim.new(0, 14)
 corner.Parent = mainFrame
 
 local uiStroke = Instance.new("UIStroke")
-uiStroke.Thickness = 2
-uiStroke.Color = Color3.fromRGB(60, 100, 255)
+uiStroke.Thickness = 3
+uiStroke.Color = Color3.fromRGB(0, 200, 255)
 uiStroke.Parent = mainFrame
-uiStroke.Transparency = 0.3
+uiStroke.Transparency = 0
 
 -- Title Bar with Enhanced Styling
 local titleBar = Instance.new("Frame")
 titleBar.Name = "TitleBar"
 titleBar.Size = UDim2.new(1, 0, 0, 60)
-titleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+titleBar.BackgroundColor3 = Color3.fromRGB(5, 30, 50)
 titleBar.BorderSizePixel = 0
 titleBar.Parent = mainFrame
 
@@ -74,8 +74,8 @@ titleCorner.CornerRadius = UDim.new(0, 14)
 titleCorner.Parent = titleBar
 
 local titleGradientBar = Instance.new("Frame")
-titleGradientBar.Size = UDim2.new(1, 0, 0, 3)
-titleGradientBar.BackgroundColor3 = Color3.fromRGB(60, 100, 255)
+titleGradientBar.Size = UDim2.new(1, 0, 0, 4)
+titleGradientBar.BackgroundColor3 = Color3.fromRGB(0, 255, 200)
 titleGradientBar.BorderSizePixel = 0
 titleGradientBar.Parent = titleBar
 
@@ -85,7 +85,7 @@ titleIcon.Text = "⚡"
 titleIcon.Size = UDim2.new(0, 30, 0, 30)
 titleIcon.Position = UDim2.new(0, 12, 0.5, -15)
 titleIcon.BackgroundTransparency = 1
-titleIcon.TextColor3 = Color3.fromRGB(100, 180, 255)
+titleIcon.TextColor3 = Color3.fromRGB(0, 255, 200)
 titleIcon.TextSize = 18
 titleIcon.Font = Enum.Font.GothamBold
 titleIcon.Parent = titleBar
@@ -96,8 +96,8 @@ title.Text = "DREAM PARRY"
 title.Size = UDim2.new(1, -90, 0, 25)
 title.Position = UDim2.new(0, 45, 0, 8)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 15
+title.TextColor3 = Color3.fromRGB(0, 255, 200)
+title.TextSize = 16
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
@@ -108,8 +108,8 @@ subtitle.Text = "Advanced Parry System"
 subtitle.Size = UDim2.new(1, -90, 0, 16)
 subtitle.Position = UDim2.new(0, 45, 0, 32)
 subtitle.BackgroundTransparency = 1
-subtitle.TextColor3 = Color3.fromRGB(150, 170, 200)
-subtitle.TextSize = 10
+subtitle.TextColor3 = Color3.fromRGB(100, 220, 255)
+subtitle.TextSize = 11
 subtitle.Font = Enum.Font.GothamMedium
 subtitle.TextXAlignment = Enum.TextXAlignment.Left
 subtitle.Parent = titleBar
@@ -120,8 +120,8 @@ minButton.Name = "MinButton"
 minButton.Text = "━"
 minButton.Size = UDim2.new(0, 30, 0, 30)
 minButton.Position = UDim2.new(1, -42, 0.5, -15)
-minButton.BackgroundColor3 = Color3.fromRGB(30, 50, 100)
-minButton.TextColor3 = Color3.fromRGB(150, 200, 255)
+minButton.BackgroundColor3 = Color3.fromRGB(0, 80, 150)
+minButton.TextColor3 = Color3.fromRGB(0, 255, 200)
 minButton.TextSize = 16
 minButton.Font = Enum.Font.GothamBold
 minButton.ZIndex = 5
@@ -129,18 +129,18 @@ minButton.Parent = titleBar
 
 Instance.new("UICorner", minButton).CornerRadius = UDim.new(0, 8)
 local minStroke = Instance.new("UIStroke")
-minStroke.Thickness = 1.5
-minStroke.Color = Color3.fromRGB(60, 100, 200)
+minStroke.Thickness = 2
+minStroke.Color = Color3.fromRGB(0, 200, 255)
 minStroke.Parent = minButton
-minStroke.Transparency = 0.4
+minStroke.Transparency = 0
 
 -- Button hover effects
 minButton.MouseEnter:Connect(function()
-    TweenService:Create(minButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 100, 180)}):Play()
+    TweenService:Create(minButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}):Play()
 end)
 
 minButton.MouseLeave:Connect(function()
-    TweenService:Create(minButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 50, 100)}):Play()
+    TweenService:Create(minButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 80, 150)}):Play()
 end)
 
 -- Scroll Frame (Enhanced)
@@ -151,7 +151,7 @@ scrollFrame.Position = UDim2.new(0, 12, 0, 75)
 scrollFrame.BackgroundTransparency = 1
 scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 4
-scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 130, 255)
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 200, 255)
 scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 350)
 scrollFrame.Parent = mainFrame
 
@@ -163,9 +163,9 @@ listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 local statsLabel = Instance.new("TextLabel")
 statsLabel.Size = UDim2.new(1, -24, 0, 50)
 statsLabel.Position = UDim2.new(0, 12, 1, -62)
-statsLabel.BackgroundColor3 = Color3.fromRGB(20, 30, 15)
+statsLabel.BackgroundColor3 = Color3.fromRGB(5, 30, 40)
 statsLabel.Text = "🔒 Waiting for activation..."
-statsLabel.TextColor3 = Color3.fromRGB(150, 200, 100)
+statsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
 statsLabel.Font = Enum.Font.GothamMedium
 statsLabel.TextSize = 11
 statsLabel.BorderSizePixel = 0
@@ -174,9 +174,9 @@ statsLabel.Parent = mainFrame
 
 Instance.new("UICorner", statsLabel).CornerRadius = UDim.new(0, 10)
 local statsStroke = Instance.new("UIStroke", statsLabel)
-statsStroke.Color = Color3.fromRGB(80, 150, 60)
-statsStroke.Thickness = 1.5
-statsStroke.Transparency = 0.3
+statsStroke.Color = Color3.fromRGB(0, 200, 255)
+statsStroke.Thickness = 2
+statsStroke.Transparency = 0
 
 -- Minimize / Unminimize Logic (Enhanced)
 local isMinimized = false
@@ -205,21 +205,21 @@ local function showNotification(message, isSuccess)
     local notifFrame = Instance.new("Frame")
     notifFrame.Size = UDim2.new(0, 300, 0, 60)
     notifFrame.Position = UDim2.new(0.5, -150, 0, -80)
-    notifFrame.BackgroundColor3 = isSuccess and Color3.fromRGB(15, 35, 15) or Color3.fromRGB(35, 15, 15)
+    notifFrame.BackgroundColor3 = isSuccess and Color3.fromRGB(0, 40, 30) or Color3.fromRGB(40, 10, 10)
     notifFrame.ZIndex = 10
     notifFrame.Parent = screenGui
     
     Instance.new("UICorner", notifFrame).CornerRadius = UDim.new(0, 12)
     local stroke = Instance.new("UIStroke", notifFrame)
     stroke.Thickness = 2
-    stroke.Color = isSuccess and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+    stroke.Color = isSuccess and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 100, 100)
     
     local icon = Instance.new("TextLabel")
     icon.Size = UDim2.new(0, 30, 0, 30)
     icon.Position = UDim2.new(0, 12, 0.5, -15)
     icon.BackgroundTransparency = 1
     icon.Text = isSuccess and "✓" or "✕"
-    icon.TextColor3 = isSuccess and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+    icon.TextColor3 = isSuccess and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 100, 100)
     icon.Font = Enum.Font.GothamBold
     icon.TextSize = 20
     icon.Parent = notifFrame
@@ -252,7 +252,7 @@ local trackerPanel = Instance.new("Frame")
 trackerPanel.Name = "BallTrackerPanel"
 trackerPanel.Size = UDim2.new(0, 220, 0, 130)
 trackerPanel.Position = UDim2.new(0.05, 0, 0.4, 0)
-trackerPanel.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
+trackerPanel.BackgroundColor3 = Color3.fromRGB(5, 20, 40)
 trackerPanel.BorderSizePixel = 0
 trackerPanel.Active = true
 trackerPanel.Draggable = true
@@ -261,16 +261,16 @@ trackerPanel.Parent = screenGui
 
 Instance.new("UICorner", trackerPanel).CornerRadius = UDim.new(0, 12)
 local trackerStroke = Instance.new("UIStroke", trackerPanel)
-trackerStroke.Thickness = 2
-trackerStroke.Color = Color3.fromRGB(80, 150, 255)
-trackerStroke.Transparency = 0.2
+trackerStroke.Thickness = 3
+trackerStroke.Color = Color3.fromRGB(0, 200, 255)
+trackerStroke.Transparency = 0
 
 local trackerTitle = Instance.new("TextLabel")
 trackerTitle.Text = "📊 BALL TRACKER"
 trackerTitle.Size = UDim2.new(1, 0, 0, 28)
-trackerTitle.BackgroundColor3 = Color3.fromRGB(15, 25, 50)
+trackerTitle.BackgroundColor3 = Color3.fromRGB(0, 60, 100)
 trackerTitle.BorderSizePixel = 0
-trackerTitle.TextColor3 = Color3.fromRGB(100, 180, 255)
+trackerTitle.TextColor3 = Color3.fromRGB(0, 255, 200)
 trackerTitle.Font = Enum.Font.GothamBold
 trackerTitle.TextSize = 11
 trackerTitle.Parent = trackerPanel
@@ -281,7 +281,7 @@ speedHUD.Text = "⚡ Velocity: 0 studs/s"
 speedHUD.Size = UDim2.new(1, -20, 0, 28)
 speedHUD.Position = UDim2.new(0, 10, 0, 35)
 speedHUD.BackgroundTransparency = 1
-speedHUD.TextColor3 = Color3.fromRGB(200, 220, 255)
+speedHUD.TextColor3 = Color3.fromRGB(0, 255, 200)
 speedHUD.Font = Enum.Font.GothamMedium
 speedHUD.TextSize = 12
 speedHUD.TextXAlignment = Enum.TextXAlignment.Left
@@ -292,7 +292,7 @@ targetHUD.Text = "🎯 Target: SAFE"
 targetHUD.Size = UDim2.new(1, -20, 0, 28)
 targetHUD.Position = UDim2.new(0, 10, 0, 72)
 targetHUD.BackgroundTransparency = 1
-targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100)
+targetHUD.TextColor3 = Color3.fromRGB(0, 255, 150)
 targetHUD.Font = Enum.Font.GothamBold
 targetHUD.TextSize = 12
 targetHUD.TextXAlignment = Enum.TextXAlignment.Left
@@ -303,9 +303,9 @@ local spamFloatButton = Instance.new("TextButton")
 spamFloatButton.Name = "SpamFloatButton"
 spamFloatButton.Size = UDim2.new(0, 70, 0, 70)
 spamFloatButton.Position = UDim2.new(0.8, 0, 0.5, -35)
-spamFloatButton.BackgroundColor3 = Color3.fromRGB(30, 60, 120)
+spamFloatButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
 spamFloatButton.Text = "🔥"
-spamFloatButton.TextColor3 = Color3.fromRGB(255, 200, 100)
+spamFloatButton.TextColor3 = Color3.fromRGB(255, 200, 0)
 spamFloatButton.Font = Enum.Font.GothamBold
 spamFloatButton.TextSize = 24
 spamFloatButton.Active = true
@@ -318,21 +318,21 @@ floatCorner.CornerRadius = UDim.new(1, 0)
 floatCorner.Parent = spamFloatButton
 
 local floatStroke = Instance.new("UIStroke")
-floatStroke.Thickness = 2
-floatStroke.Color = Color3.fromRGB(255, 150, 50)
+floatStroke.Thickness = 3
+floatStroke.Color = Color3.fromRGB(0, 255, 200)
 floatStroke.Parent = spamFloatButton
-floatStroke.Transparency = 0.2
+floatStroke.Transparency = 0
 
 -- Hover effects for spam button
 spamFloatButton.MouseEnter:Connect(function()
-    TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 100, 180)}):Play()
+    TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 150, 255)}):Play()
     floatStroke.Transparency = 0
 end)
 
 spamFloatButton.MouseLeave:Connect(function()
     if not IsSpamming then
-        TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 60, 120)}):Play()
-        floatStroke.Transparency = 0.2
+        TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 100, 200)}):Play()
+        floatStroke.Transparency = 0
     end
 end)
 
@@ -352,10 +352,10 @@ end
 spamFloatButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         IsSpamming = true
-        TweenService:Create(spamFloatButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 100, 50)}):Play()
+        TweenService:Create(spamFloatButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 100, 0)}):Play()
         spamFloatButton.Text = "⚡"
         floatStroke.Transparency = 0
-        floatStroke.Color = Color3.fromRGB(255, 100, 50)
+        floatStroke.Color = Color3.fromRGB(255, 150, 0)
         executeSpamLoop()
     end
 end)
@@ -363,10 +363,10 @@ end)
 spamFloatButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         IsSpamming = false
-        TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 60, 120)}):Play()
+        TweenService:Create(spamFloatButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 100, 200)}):Play()
         spamFloatButton.Text = "🔥"
-        floatStroke.Color = Color3.fromRGB(255, 150, 50)
-        floatStroke.Transparency = 0.2
+        floatStroke.Color = Color3.fromRGB(0, 255, 200)
+        floatStroke.Transparency = 0
     end
 end)
 
@@ -374,22 +374,22 @@ end)
 local function createSlider(label, minVal, maxVal, defaultVal, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 70)
-    container.BackgroundColor3 = Color3.fromRGB(20, 25, 40)
+    container.BackgroundColor3 = Color3.fromRGB(15, 35, 60)
     container.BorderSizePixel = 0
     container.Parent = scrollFrame
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 10)
     local containerStroke = Instance.new("UIStroke", container)
-    containerStroke.Color = Color3.fromRGB(60, 100, 180)
-    containerStroke.Thickness = 1.5
-    containerStroke.Transparency = 0.4
+    containerStroke.Color = Color3.fromRGB(0, 150, 255)
+    containerStroke.Thickness = 2
+    containerStroke.Transparency = 0
     
     local labelText = Instance.new("TextLabel")
     labelText.Text = label
     labelText.Size = UDim2.new(1, -60, 0, 20)
     labelText.Position = UDim2.new(0, 10, 0, 8)
     labelText.BackgroundTransparency = 1
-    labelText.TextColor3 = Color3.fromRGB(150, 190, 255)
-    labelText.TextSize = 11
+    labelText.TextColor3 = Color3.fromRGB(0, 255, 200)
+    labelText.TextSize = 12
     labelText.Font = Enum.Font.GothamBold
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     labelText.Parent = container
@@ -399,7 +399,7 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     valueLabel.Size = UDim2.new(0, 45, 0, 20)
     valueLabel.Position = UDim2.new(1, -55, 0, 8)
     valueLabel.BackgroundTransparency = 1
-    valueLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+    valueLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
     valueLabel.TextSize = 12
     valueLabel.Font = Enum.Font.GothamBold
     valueLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -408,7 +408,7 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     local sliderButton = Instance.new("TextButton")
     sliderButton.Size = UDim2.new(1, -20, 0, 6)
     sliderButton.Position = UDim2.new(0, 10, 0, 40)
-    sliderButton.BackgroundColor3 = Color3.fromRGB(35, 50, 90)
+    sliderButton.BackgroundColor3 = Color3.fromRGB(20, 50, 100)
     sliderButton.Text = ""
     sliderButton.BorderSizePixel = 0
     sliderButton.Parent = container
@@ -416,7 +416,7 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     
     local fill = Instance.new("Frame")
     fill.Size = UDim2.new((defaultVal - minVal) / (maxVal - minVal), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+    fill.BackgroundColor3 = Color3.fromRGB(0, 255, 150)
     fill.BorderSizePixel = 0
     fill.Parent = sliderButton
     Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 3)
@@ -448,23 +448,23 @@ end
 local function createToggle(label, defaultState, callback)
     local container = Instance.new("TextButton")
     container.Size = UDim2.new(1, 0, 0, 50)
-    container.BackgroundColor3 = Color3.fromRGB(20, 25, 40)
+    container.BackgroundColor3 = Color3.fromRGB(15, 35, 60)
     container.BorderSizePixel = 0
     container.Text = ""
     container.Parent = scrollFrame
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 10)
     local containerStroke = Instance.new("UIStroke", container)
-    containerStroke.Color = Color3.fromRGB(60, 100, 180)
-    containerStroke.Thickness = 1.5
-    containerStroke.Transparency = 0.4
+    containerStroke.Color = Color3.fromRGB(0, 150, 255)
+    containerStroke.Thickness = 2
+    containerStroke.Transparency = 0
     
     local labelText = Instance.new("TextLabel")
     labelText.Text = label
     labelText.Size = UDim2.new(1, -70, 1, 0)
     labelText.Position = UDim2.new(0, 12, 0, 0)
     labelText.BackgroundTransparency = 1
-    labelText.TextColor3 = Color3.fromRGB(200, 220, 255)
-    labelText.TextSize = 12
+    labelText.TextColor3 = Color3.fromRGB(0, 255, 200)
+    labelText.TextSize = 13
     labelText.Font = Enum.Font.GothamBold
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     labelText.Parent = container
@@ -472,15 +472,15 @@ local function createToggle(label, defaultState, callback)
     local toggleButton = Instance.new("Frame")
     toggleButton.Size = UDim2.new(0, 40, 0, 20)
     toggleButton.Position = UDim2.new(1, -50, 0.5, -10)
-    toggleButton.BackgroundColor3 = defaultState and Color3.fromRGB(100, 200, 255) or Color3.fromRGB(40, 50, 80)
+    toggleButton.BackgroundColor3 = defaultState and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(30, 60, 100)
     toggleButton.BorderSizePixel = 0
     toggleButton.Parent = container
     Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 10)
     
     local toggleStroke = Instance.new("UIStroke", toggleButton)
-    toggleStroke.Color = Color3.fromRGB(60, 120, 200)
+    toggleStroke.Color = Color3.fromRGB(0, 200, 255)
     toggleStroke.Thickness = 1.5
-    toggleStroke.Transparency = 0.3
+    toggleStroke.Transparency = 0
     
     local toggleCircle = Instance.new("Frame")
     toggleCircle.Size = UDim2.new(0, 16, 0, 16)
@@ -493,7 +493,7 @@ local function createToggle(label, defaultState, callback)
     local isEnabled = defaultState
     container.MouseButton1Click:Connect(function()
         isEnabled = not isEnabled
-        local targetColor = isEnabled and Color3.fromRGB(100, 200, 255) or Color3.fromRGB(40, 50, 80)
+        local targetColor = isEnabled and Color3.fromRGB(0, 200, 255) or Color3.fromRGB(30, 60, 100)
         local targetPos = isEnabled and UDim2.new(0, 21, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
         
         TweenService:Create(toggleButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
@@ -507,7 +507,7 @@ local function createToggle(label, defaultState, callback)
     end)
     
     container.MouseLeave:Connect(function()
-        TweenService:Create(containerStroke, TweenInfo.new(0.2), {Transparency = 0.4}):Play()
+        TweenService:Create(containerStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
     end)
 end
 
@@ -541,10 +541,10 @@ local function unlockEngine()
     if not HasManualParried then
         HasManualParried = true
         
-        statsLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        statsLabel.BackgroundColor3 = Color3.fromRGB(15, 40, 15)
+        statsLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+        statsLabel.BackgroundColor3 = Color3.fromRGB(5, 40, 20)
         statsLabel.Text = "✓ SYSTEM ACTIVE - Ready for parrying"
-        statsStroke.Color = Color3.fromRGB(100, 255, 100)
+        statsStroke.Color = Color3.fromRGB(0, 255, 150)
         
         showNotification("🔓 System Activated!", true)
         
@@ -593,7 +593,7 @@ local function MonitorBall(Ball)
             connection:Disconnect()
             speedHUD.Text = "⚡ Velocity: 0 studs/s"
             targetHUD.Text = "🎯 Target: SAFE"
-            targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100)
+            targetHUD.TextColor3 = Color3.fromRGB(0, 255, 150)
             return
         end
         
@@ -610,14 +610,14 @@ local function MonitorBall(Ball)
                 speedHUD.Text = "⚡ Velocity: " .. math.floor(ballSpeed) .. " studs/s"
                 if isTargetingMe then
                     targetHUD.Text = "🚨 Target: DANGER!"
-                    targetHUD.TextColor3 = Color3.fromRGB(255, 80, 80)
-                    trackerStroke.Color = Color3.fromRGB(255, 80, 80)
-                    trackerStroke.Transparency = 0.1
+                    targetHUD.TextColor3 = Color3.fromRGB(255, 100, 100)
+                    trackerStroke.Color = Color3.fromRGB(255, 100, 100)
+                    trackerStroke.Transparency = 0
                 else
                     targetHUD.Text = "🎯 Target: SAFE"
-                    targetHUD.TextColor3 = Color3.fromRGB(100, 255, 100)
-                    trackerStroke.Color = Color3.fromRGB(80, 200, 80)
-                    trackerStroke.Transparency = 0.2
+                    targetHUD.TextColor3 = Color3.fromRGB(0, 255, 150)
+                    trackerStroke.Color = Color3.fromRGB(0, 200, 255)
+                    trackerStroke.Transparency = 0
                 end
             end
             
