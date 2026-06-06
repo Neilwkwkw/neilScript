@@ -12,9 +12,8 @@ local Balls = Workspace:WaitForChild("Balls")
 
 -- MGA GLOBAL SETTINGS (Konektado sa UI)
 local AutoParryEnabled = false
-local ActivationDistance = 30 -- Ito ang babaguhin ng Slider
+local ActivationDistance = 30 
 
--- I-DELETE ANG LUMANG GUI KUNG MERON MAN PARA WALANG PATONG-PATONG
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
 end
@@ -28,11 +27,12 @@ screenGui.Parent = PlayerGui
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 330, 0, 380)
-mainFrame.Position = UDim2.new(0.5, -165, 0.4, -190) -- Gitna ng screen para sa Mobile
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mainFrame.Position = UDim2.new(0.5, -165, 0.4, -190) 
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
-mainFrame.Draggable = true -- Pwede mong itulak-tulak sa screen ng CP
+mainFrame.Draggable = true -- Pwede pa ring i-drag kahit maliit!
+mainFrame.ClipsDescendants = true -- Mahalaga ito para maitago ang laman kapag pinaliit
 mainFrame.Parent = screenGui
 
 local corner = Instance.new("UICorner")
@@ -53,13 +53,31 @@ titleCorner.Parent = titleBar
 
 local title = Instance.new("TextLabel")
 title.Name = "Title"
-title.Text = "⚡ BLADE BALL: GOD PARRY PRO"
-title.Size = UDim2.new(1, 0, 1, 0)
+title.Text = "Dream Parry"
+title.Size = UDim2.new(1, -50, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
 title.TextColor3 = Color3.new(1, 1, 1)
-title.TextSize = 16
+title.TextSize = 14
 title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
+
+-- ADDED: MINIMIZE BUTTON (May smooth animation)
+local minButton = Instance.new("TextButton")
+minButton.Name = "MinButton"
+minButton.Text = "-"
+minButton.Size = UDim2.new(0, 30, 0, 30)
+minButton.Position = UDim2.new(1, -40, 0.5, -15)
+minButton.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+minButton.TextColor3 = Color3.new(1, 1, 1)
+minButton.TextSize = 18
+minButton.Font = Enum.Font.GothamBold
+minButton.Parent = titleBar
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 6)
+minCorner.Parent = minButton
 
 -- Scroll frame
 local scrollFrame = Instance.new("ScrollingFrame")
@@ -76,7 +94,30 @@ local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Padding = UDim.new(0, 10)
 UIListLayout.Parent = scrollFrame
 
--- FIX #1: MOBILE-FRIENDLY SLIDER FUNCTION
+-- MINIMIZE SYSTEM LOGIC
+local isMinimized = false
+minButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    
+    local targetSize
+    if isMinimized then
+        targetSize = UDim2.new(0, 330, 0, 50) -- Sukat ng Title Bar na lang ang maiiwan
+        minButton.Text = "+"
+    else
+        targetSize = UDim2.new(0, 330, 0, 380) -- Babalik sa dating laki
+        minButton.Text = "-"
+    end
+    
+    -- Smooth slide animation gamit ang TweenService
+    local tween = TweenService:Create(
+        mainFrame,
+        TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {Size = targetSize}
+    )
+    tween:Play()
+end)
+
+-- SLIDER FUNCTION
 local function createSlider(label, minVal, maxVal, defaultVal, callback)
     local container = Instance.new("Frame")
     container.Name = label
@@ -164,7 +205,7 @@ local function createSlider(label, minVal, maxVal, defaultVal, callback)
     end)
 end
 
--- FIX #2: TEXTBUTTON PARA GUMANA ANG CLICK SA TOGGLE
+-- TOGGLE FUNCTION
 local function createToggle(label, defaultState, callback)
     local container = Instance.new("TextButton")
     container.Name = label
@@ -247,27 +288,17 @@ local statsCorner = Instance.new("UICorner")
 statsCorner.CornerRadius = UDim.new(0, 6)
 statsCorner.Parent = statsLabel
 
-
--- =========================================================
--- BUILD THE UI ELEMENTS
--- =========================================================
-
--- 1. Slider para sa Custom Activation Distance
+-- BUILD ELEMENTS
 createSlider("Parry Distance (Studs)", 15, 60, 30, function(value)
     ActivationDistance = value
 end)
 
--- 2. Main Auto Parry Toggle
 createToggle("God Auto Parry", false, function(state)
     AutoParryEnabled = state
     statsLabel.Text = state and "Status: ACTIVE (God Mode)" or "Status: Deactivated"
 end)
 
-
--- =========================================================
--- THE ULTIMATE PARRY ENGINE LOGIC
--- =========================================================
-
+-- ENGINE LOGIC
 local function IsTarget()
     return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
@@ -303,16 +334,13 @@ local function MonitorBall(Ball)
                 local ballSpeed = realVelocity.Magnitude
                 local distance = (ballPos - myPos).Magnitude
                 
-                -- DYNAMIC FORMULA: Slider distance base + speed modifier + automatic latency offset
                 local dynamicDistance = ActivationDistance + (ballSpeed * 0.11)
-                
-                -- Siguraduhing pasugod ang bola sa player, hindi papalayo
                 local dotProduct = realVelocity.Unit:Dot((myPos - ballPos).Unit)
                 
                 if distance <= dynamicDistance and dotProduct > 0 then
                     Parry()
                     statsLabel.Text = "Last Parry Speed: " .. math.floor(ballSpeed)
-                    task.wait(0.12) -- Prevent click registration overload
+                    task.wait(0.12)
                 end
             end
         end
@@ -322,8 +350,7 @@ local function MonitorBall(Ball)
     end)
 end
 
--- Hook sa folder tracking ng tropa mo
 table.foreach(Balls:GetChildren(), function(_, ball) MonitorBall(ball) end)
 Balls.ChildAdded:Connect(MonitorBall)
 
-print("[+] Custom Pro GUI Loaded and Synced!")
+print("[+] Custom Pro GUI with Minimize Feature Loaded!")
