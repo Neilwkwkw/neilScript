@@ -13,11 +13,11 @@ local Balls = Workspace:WaitForChild("Balls")
 -- MGA GLOBAL SETTINGS
 local AutoParryEnabled = false
 local ActivationDistance = 30 
-local HasManualParried = false -- Hard Anti-Cheat Lock
+local HasManualParried = false -- Hard Anti-Cheat Lock Hook
 local ManualSpamEnabled = false
 local IsSpamming = false
 local BallTrackerEnabled = false 
-local LastParryTick = 0 -- Anti-Spam Guard Hook
+local LastParryTick = 0 -- Anti-Spam Guard
 
 if PlayerGui:FindFirstChild("AutoParryGui") then
     PlayerGui.AutoParryGui:Destroy()
@@ -250,16 +250,16 @@ floatStroke.Thickness = 1
 floatStroke.Color = Color3.fromRGB(60, 60, 60) 
 floatStroke.Parent = spamFloatButton
 
--- UNDETECTED SPAM COMMAND LOOPER (Humanized Random Delays)
+-- UNDETECTED SPAM COMMAND LOOPER
 local function executeSpamLoop()
     task.spawn(function()
         while IsSpamming and ManualSpamEnabled and HasManualParried do
             pcall(function()
                 VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-                task.wait(math.random(15, 30) / 1000) -- Random hold time
+                task.wait(math.random(15, 30) / 1000) 
                 VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
             end)
-            task.wait(math.random(15, 35) / 1000) -- Random interval cooldown to bypass logging
+            task.wait(math.random(15, 35) / 1000) 
         end
     end)
 end
@@ -459,16 +459,16 @@ local function IsTarget()
     return (Player.Character and Player.Character:FindFirstChild("Highlight"))
 end
 
--- FIXED: HUMANIZED BYPASS INPUT WRAPPER (Anti-Kick Method)
+-- HUMANIZED PARRY EXECUTOR
 local function Parry()
     local currentTick = tick()
-    if currentTick - LastParryTick < 0.25 then return end -- Exhaust Guard (Iwas magkasunod na double click sa parehong frame)
+    if currentTick - LastParryTick < 0.25 then return end 
     LastParryTick = currentTick
 
-    task.defer(function() -- Defer Execution para hindi ma-trace sa server frame timing loop
+    task.defer(function() 
         pcall(function()
             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
-            task.wait(math.random(25, 45) / 1000) -- Humanized hold ratio delay (mukhang daliri ng tao)
+            task.wait(math.random(25, 45) / 1000) 
             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.F, false, game)
         end)
     end)
@@ -512,13 +512,8 @@ local function MonitorBall(Ball)
                 end
             end
             
-            if not HasManualParried then 
-                lastPosition = Ball.Position
-                lastUpdateTime = tick()
-                return 
-            end
-            
-            if AutoParryEnabled and isTargetingMe and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            -- FIXED LOGIC BYPASS: Hinahayaan pa ring mag-update ang posisyon kahit wala pang manual parry para hindi mag-freeze ang math
+            if HasManualParried and AutoParryEnabled and isTargetingMe and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 local myPos = Player.Character.HumanoidRootPart.Position
                 local distance = (Ball.Position - myPos).Magnitude
                 
