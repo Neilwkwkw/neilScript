@@ -1,44 +1,146 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
-local Window = Fluent:CreateWindow({
-    Title = "Blatant",
-    SubTitle = "Blade Ball Manager",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(600, 450),
-    Acrylic = true,
-    Theme = "Dark"
-})
+local Window = OrionLib:MakeWindow({Name = "Blatant", HidePremium = false, SaveConfig = true, ConfigFolder = "BlatantConfig"})
 
 -- Tabs
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "swords" })
-}
+local Tab = Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
 
 -- BLATANT SECTION
-local BlatantSection = Tabs.Main:AddSection("Blatant")
+Tab:AddSection({ Name = "Blatant" })
 
-BlatantSection:AddToggle("AutoParry", {Title = "Auto Parry", Default = false })
-BlatantSection:AddSlider("ParryAccuracy", {Title = "Parry Accuracy", Default = 32, Min = 0, Max = 100})
-BlatantSection:AddDropdown("AutoCurve", {Title = "Auto Curve Direction", Values = {"Random", "Left", "Right"}, Multi = false, Default = 1})
-BlatantSection:AddToggle("CooldownProtection", {Title = "Cooldown Protection", Default = true })
+Tab:AddToggle({
+	Name = "Auto Parry",
+	Default = false,
+	Callback = function(Value)
+		print("Auto Parry: " .. tostring(Value))
+	end    
+})
+
+Tab:AddSlider({
+	Name = "Parry Accuracy",
+	Min = 0,
+	Max = 100,
+	Default = 32,
+	Increment = 1,
+	Callback = function(Value)
+		print("Accuracy: " .. Value)
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Auto Curve Direction",
+	Default = "Random",
+	Options = {"Random", "Left", "Right"},
+	Callback = function(Value)
+		print("Curve Direction: " .. Value)
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Cooldown Protection",
+	Default = true,
+	Callback = function(Value)
+		print("Cooldown Protection: " .. tostring(Value))
+	end    
+})
 
 -- LOBBY AUTO PARRY SECTION
-local LobbySection = Tabs.Main:AddSection("Lobby Auto Parry")
-LobbySection:AddToggle("LobbyAutoParry", {Title = "Lobby Auto Parry", Default = false })
-LobbySection:AddSlider("LobbyParryAccuracy", {Title = "Lobby Parry Accuracy", Default = 40, Min = 0, Max = 100})
-LobbySection:AddToggle("LobbyRandom", {Title = "Lobby Random Accuracy", Default = false })
+Tab:AddSection({ Name = "Lobby Auto Parry" })
+
+Tab:AddToggle({
+	Name = "Lobby Auto Parry",
+	Default = false,
+	Callback = function(Value)
+		print("Lobby Auto Parry: " .. tostring(Value))
+	end    
+})
+
+Tab:AddSlider({
+	Name = "Lobby Parry Accuracy",
+	Min = 0,
+	Max = 100,
+	Default = 40,
+	Increment = 1,
+	Callback = function(Value)
+		print("Lobby Accuracy: " .. Value)
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Lobby Random Accuracy",
+	Default = false,
+	Callback = function(Value)
+		print("Lobby Random: " .. tostring(Value))
+	end    
+})
 
 -- MANUEL SPAM SECTION
-local ManualSection = Tabs.Main:AddSection("Manuel Spam")
-ManualSection:AddToggle("ManualSpam", {Title = "Manuel Spam", Default = false })
-ManualSection:AddDropdown("SpamMode", {Title = "Mode", Values = {"Remote", "Click"}, Default = 1})
-ManualSection:AddKeybind("SpamKey", {Title = "Spam Key", Mode = "Toggle", Default = "E"})
-ManualSection:AddToggle("SpamNotify", {Title = "Spam Notify", Default = false })
-ManualSection:AddToggle("AnimFix", {Title = "Animation Fix", Default = true })
+Tab:AddSection({ Name = "Manuel Spam" })
+
+Tab:AddToggle({
+	Name = "Manuel Spam",
+	Default = false,
+	Callback = function(Value)
+		print("Manuel Spam: " .. tostring(Value))
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Mode",
+	Default = "Remote",
+	Options = {"Remote", "Click"},
+	Callback = function(Value)
+		print("Mode: " .. Value)
+	end    
+})
+
+Tab:AddBind({
+	Name = "Spam Key",
+	Default = Enum.KeyCode.E,
+	Hold = false,
+	Callback = function()
+		print("Spam Key pressed!")
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Spam Notify",
+	Default = false,
+	Callback = function(Value)
+		print("Notify: " .. tostring(Value))
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Animation Fix",
+	Default = true,
+	Callback = function(Value)
+		print("Anim Fix: " .. tostring(Value))
+	end    
+})
 
 -- AUTO SPAM PARRY SECTION
-local AutoSpamSection = Tabs.Main:AddSection("Auto Spam Parry")
-AutoSpamSection:AddToggle("AutoSpamParry", {Title = "Auto Spam Parry", Default = false })
-AutoSpamSection:AddDropdown("AutoSpamMode", {Title = "Mode", Values = {"Remote"}, Default = 1})
+Tab:AddSection({ Name = "Auto Spam Parry" })
 
-Fluent:Notify({Title = "Blatant", Content = "GUI Loaded Successfully!", Duration = 5})
+Tab:AddToggle({
+	Name = "Auto Spam Parry",
+	Default = false,
+	Callback = function(Value)
+		print("Auto Spam Parry: " .. tostring(Value))
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Mode",
+	Default = "Remote",
+	Options = {"Remote"},
+	Callback = function(Value)
+		print("Auto Spam Mode: " .. Value)
+	end    
+})
+
+OrionLib:Init()
